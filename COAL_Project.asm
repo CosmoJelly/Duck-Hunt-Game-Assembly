@@ -5,27 +5,33 @@
 ; Game: Duck Hunt on MASM 8086
 
 .model small
-.stack 300h
+.stack 100h
 
-; ----- DATA SEGMENT -----
+;----- DATA SEGMENT -----
 
-data segment para 'data'
+.data
+title_name db "Duck Hunt", 13, 10, 13, 10, "Input your name and press Enter...", 13, 10, '$'
 
-    title_name db "Duck Hunt", 13, 10, 13, 10, "Press any key to continue...", 13, 10, '$'
-    
-    menu db "Please select a choice:",13,10
-        db "1. 1P",13,10
-        db "2. 2P",13,10
-        db "3. Highscores",13,10
-        db "4. Exit",13,10,'$'
+menu db "Please select a choice:",13,10
+    db "1. 1P",13,10
+    db "2. 2P",13,10
+    db "3. Highscores",13,10
+    db "4. Exit",13,10
+    db '5. Return To Title Screen', 13, 10, '$'
 
-data ends
+game_over db "Game Over", 13, 10, "Press ESC to exit...", 13, 10, '$'
 
-; ----- CODE SEGMENT -----
+user_name db 21 dup('$')
 
-code segment para 'code'
+filename db "user_name.txt", 0
 
-    assume cs:code, ds:data
+highscore_file db "highscores.txt", 0
+
+fhandle dw ?
+
+;----- CODE SEGMENT -----
+
+.code
     main proc
         mov ax, @data       ; Initialize data segment
         mov ds, ax
@@ -35,23 +41,28 @@ code segment para 'code'
     main endp
 
     title_screen proc
-
         call clear_screen
 
         mov  dx, offset title_name    ; Load the offset of the title_name string into DX
-
         mov  ah, 9                    ; Set the function code for displaying a string
         int  21h                      ; Call the DOS interrupt to display the string
 
-        mov ah, 07h                   ; Set the function code for checking keyboard status
-        int 21h                       ; Call the DOS interrupt to check keyboard status
+        ; Prompt the user to enter their name
+        mov dx, offset user_name     ; Load the offset of user_name buffer into DX
+        mov ah, 0Ah                  ; Function code for buffered input
+        int 21h                      ; Call DOS interrupt for buffered input
+
+        ; call open_file_for_writing   ; Open the file for writing user name
+        ; jc file_error                ; Jump if there is an error
+        ; mov fhandle, ax              ; Store file handle in variable
+
+        ; call write_user_name_to_file ; Write user name to file
+        ; jc file_error                ; Jump if there is an error
 
         call clear_screen            ; Call the clear_screen procedure to clear the screen
-
-        call display_menu             ; Call the display_menu procedure to display the menu
+        call display_menu            ; Call the display_menu procedure to display the menu
 
         ret                           ; Return from the procedure
-
     title_screen endp
 
     clear_screen proc
@@ -68,7 +79,6 @@ code segment para 'code'
     clear_screen endp
 
     exit_game proc
-
         call clear_screen       ; Call the clear_screen procedure to clear the screen
 
         wait_for_key:
@@ -77,6 +87,10 @@ code segment para 'code'
 
             cmp al, 1Bh         ; Check if the key pressed is ESC (ASCII value 1Bh)
             jne wait_for_key    ; Jump back to wait_for_key if key pressed is not ESC
+
+            mov  dx, offset game_over    ; Load the offset of the game_over string into DX
+            mov  ah, 9                   ; Set the function code for displaying a string
+            int  21h                     ; Call the DOS interrupt to display the string
 
             mov ah, 4Ch         ; Set the function code for program termination
             int 21h             ; Call the DOS interrupt to terminate the program
@@ -94,7 +108,6 @@ code segment para 'code'
     display_menu endp
 
     check_input proc
-
         mov ah, 01h             ; Set the function code for checking keyboard status
         int 21h                 ; Call the DOS interrupt to check keyboard status
 
@@ -105,7 +118,7 @@ code segment para 'code'
         je exit_game            ; Jump to 2P if key pressed is '2'
 
         cmp al, 33h             ; Check if the key pressed is '3'
-        je exit_game            ; Jump to highscores if key pressed is '3'
+        je display_highscores  ; Jump to highscores if key pressed is '3'
 
         cmp al, 34h             ; Check if the key pressed is '4'
         je exit_game            ; Jump to exit_game if key pressed is '4'
@@ -115,7 +128,47 @@ code segment para 'code'
 
         jmp check_input         ; Jump back to check_input if key pressed is not '1', '2', '3', or '4'
 
+        ret                     ; Return from the procedure
     check_input endp
 
-code ends
-end
+    display_highscores proc
+        ; Implement later
+        ret
+    display_highscores endp
+
+    read_highscores_from_file proc
+        ; Implement later
+        ret
+    read_highscores_from_file endp
+
+    open_file_for_writing proc
+        ; Implement later
+        ret
+    open_file_for_writing endp
+
+    file_error proc
+        ; Implement later
+        ret
+    file_error endp
+
+    write_user_name_to_file proc
+        ; Implement later
+        ret
+    write_user_name_to_file endp
+
+    write_highscore_to_file proc
+        ; Implement later
+        ret
+    write_highscore_to_file endp
+
+    read_user_name_from_file proc
+        ; Implement later
+        ret
+    read_user_name_from_file endp
+
+    Game_Play proc
+        ; Implement later
+        ret
+    Game_Play endp
+
+end main
